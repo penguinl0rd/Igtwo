@@ -1,0 +1,12 @@
+{
+  "name": "Igloo",
+  "description": "Family Real-time Tracker & Safety Hub",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "short_name": "Igloo",
+  "theme_color": "#312e81",
+  "background_color": "#020617",
+  "display": "standalone",
+  "orientation": "portrait"
+}

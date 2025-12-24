@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Igloo - Family Connected</title>
+    
+    <!-- PWA / Mobile Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Igloo">
+    <meta name="theme-color" content="#312e81">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10700/10700147.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: 'Silkscreen', cursive;
+            background-color: #020617;
+            color: #f1f5f9;
+            user-select: none;
+            overflow: hidden;
+            touch-action: manipulation;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .pixel-border {
+            box-shadow: 0 -4px 0 0 #1e293b, 0 4px 0 0 #1e293b, -4px 0 0 0 #1e293b, 4px 0 0 0 #1e293b;
+        }
+        .pixel-border-sm {
+            box-shadow: 0 -2px 0 0 #1e293b, 0 2px 0 0 #1e293b, -2px 0 0 0 #1e293b, 2px 0 0 0 #1e293b;
+        }
+        .pixel-button-press:active {
+            transform: translateY(2px);
+            filter: brightness(0.8);
+        }
+        .pixel-marker {
+            background: none !important;
+            border: none !important;
+        }
+        .pixel-map {
+            filter: grayscale(100%) invert(100%) brightness(0.6) contrast(1.4) sepia(20%) hue-rotate(190deg);
+        }
+        .leaflet-container {
+            background: #020617 !important;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+</body>
+</html>
