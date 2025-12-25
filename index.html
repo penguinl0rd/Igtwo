@@ -10,15 +10,22 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Igloo">
-    <meta name="theme-color" content="#312e81">
+    <meta name="theme-color" content="#020617">
     <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10700/10700147.png">
+    
+    <!-- High quality Igloo Icon for Apple and Android -->
+    <link rel="apple-touch-icon" href="https://img.icons8.com/pixel-bubble/512/igloo.png">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/pixel-bubble/512/igloo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        :root {
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
         body {
             font-family: 'Silkscreen', cursive;
             background-color: #020617;
@@ -26,11 +33,15 @@
             user-select: none;
             overflow: hidden;
             touch-action: manipulation;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+            /* Fix for overlapping system bars */
+            padding-top: var(--safe-top);
+            height: 100vh;
+            height: -webkit-fill-available;
         }
-        .pixel-border {
-            box-shadow: 0 -4px 0 0 #1e293b, 0 4px 0 0 #1e293b, -4px 0 0 0 #1e293b, 4px 0 0 0 #1e293b;
+        #root {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .pixel-border-sm {
             box-shadow: 0 -2px 0 0 #1e293b, 0 2px 0 0 #1e293b, -2px 0 0 0 #1e293b, 2px 0 0 0 #1e293b;

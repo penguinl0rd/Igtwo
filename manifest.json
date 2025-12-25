@@ -1,18 +1,23 @@
 
 {
-  "name": "Igloo Family",
+  "name": "Igloo Family Tracker",
   "short_name": "Igloo",
-  "description": "Cozy family connection and tracking.",
-  "start_url": ".",
+  "description": "Real-time family safety and connection.",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#020617",
-  "theme_color": "#312e81",
+  "theme_color": "#020617",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/10700/10700147.png",
+      "src": "https://img.icons8.com/pixel-bubble/512/igloo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "https://img.icons8.com/pixel-bubble/192/igloo.png",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ]
 }

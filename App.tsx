@@ -43,27 +43,12 @@ const App: React.FC = () => {
   const insideBubbles = useRef<Set<string>>(new Set());
   const watchId = useRef<number | null>(null);
 
-  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371e3;
-    const φ1 = lat1 * Math.PI/180;
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lon2-lon1) * Math.PI/180;
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
-
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationError("GPS NOT SUPPORTED");
       return;
     }
-
     setLocationError(null);
-    
     if (watchId.current) navigator.geolocation.clearWatch(watchId.current);
 
     watchId.current = navigator.geolocation.watchPosition(
@@ -71,23 +56,18 @@ const App: React.FC = () => {
         const { latitude, longitude } = pos.coords;
         setLocationReady(true);
         setLocationError(null);
-        
         setFamily(prev => ({
           ...prev,
           members: prev.members.map(m => m.id === 'me' ? { ...m, lat: latitude, lng: longitude, status: 'home' } : m)
         }));
-
         syncChannel.current?.postMessage({
           type: 'LOCATION_UPDATE',
           memberId: 'me',
           lat: latitude,
           lng: longitude
         });
-
-        checkAutomations(latitude, longitude);
       },
       (err) => {
-        console.error("GPS Error:", err);
         let msg = "SIGNAL LOST";
         if (err.code === 1) msg = "PERMISSION DENIED";
         else if (err.code === 3) msg = "GPS TIMEOUT (RETRY)";
@@ -114,50 +94,12 @@ const App: React.FC = () => {
         audio.playSuccess();
       }
     };
-
     startTracking();
-
     return () => {
         syncChannel.current?.close();
         if (watchId.current) navigator.geolocation.clearWatch(watchId.current);
     };
   }, [startTracking]);
-
-  useEffect(() => {
-    localStorage.setItem('igloo_palette', JSON.stringify(palette));
-    localStorage.setItem('igloo_family', JSON.stringify(family));
-    localStorage.setItem('igloo_reports', JSON.stringify(reports));
-  }, [palette, family, reports]);
-
-  const checkAutomations = useCallback((lat: number, lng: number) => {
-    family.automations.forEach(rule => {
-      if (!rule.enabled) return;
-      const isTrigger = rule.triggerMemberIds.includes('all') || rule.triggerMemberIds.includes('me');
-      if (!isTrigger) return;
-
-      const dist = getDistance(lat, lng, rule.lat, rule.lng);
-      const isInside = dist <= rule.radius;
-
-      if (isInside && !insideBubbles.current.has(rule.id)) {
-        insideBubbles.current.add(rule.id);
-        const me = family.members.find(m => m.id === 'me')!;
-        const autoReport: BroadcastMessage = {
-          id: `auto-${Date.now()}`,
-          senderId: 'me',
-          senderName: me.name,
-          type: 'automation',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          message: `${me.name} ENTERED ${rule.name}`,
-          targetMemberIds: rule.receiverMemberIds,
-          mapLink: `https://www.google.com/maps?q=${rule.lat},${rule.lng}`
-        } as any;
-        syncChannel.current?.postMessage({ type: 'STATUS_UPDATE', report: autoReport });
-        setReports(prev => [autoReport, ...prev].slice(0, 15));
-      } else if (!isInside && insideBubbles.current.has(rule.id)) {
-        insideBubbles.current.delete(rule.id);
-      }
-    });
-  }, [family.automations, family.members]);
 
   const handleNav = (view: ViewType) => {
     audio.playSelect();
@@ -165,17 +107,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col relative overflow-hidden" style={{ backgroundColor: palette.secondary }}>
-      <header className="h-16 px-4 flex items-center justify-between border-b-4 border-slate-800 bg-slate-950/90 backdrop-blur-md z-[1000]">
+    <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: palette.secondary }}>
+      <header className="h-14 px-4 flex items-center justify-between border-b-4 border-slate-800 bg-slate-950/90 backdrop-blur-md z-[1000]">
         <button onClick={() => handleNav('family')} className={`p-2 pixel-border-sm pixel-button-press transition-all ${activeView === 'family' ? 'bg-indigo-600' : 'bg-slate-800'}`}>
           <PIXEL_ICONS.Family />
         </button>
         <div className="flex flex-col items-center">
             <div className="flex items-center gap-2">
-                <div className="w-6 h-6 text-indigo-400"><PIXEL_ICONS.Igloo /></div>
-                <span className="text-lg font-bold tracking-widest text-white">IGLOO</span>
+                <div className="w-5 h-5 text-indigo-400"><PIXEL_ICONS.Igloo /></div>
+                <span className="text-md font-bold tracking-widest text-white">IGLOO</span>
             </div>
-            <span className="text-[9px] text-indigo-400 font-bold tracking-[0.2em]">{family.familyId}</span>
+            <span className="text-[8px] text-indigo-400 font-bold tracking-[0.2em]">{family.familyId}</span>
         </div>
         <button onClick={() => handleNav('settings')} className={`p-2 pixel-border-sm pixel-button-press transition-all ${activeView === 'settings' ? 'bg-indigo-600' : 'bg-slate-800'}`}>
           <PIXEL_ICONS.Cog />
@@ -198,7 +140,8 @@ const App: React.FC = () => {
         {activeView === 'settings' && <SettingsView palette={palette} setPalette={setPalette} me={family.members.find(m => m.id === 'me')!} updateProfile={(n, i) => {}} />}
       </main>
 
-      <nav className="h-20 border-t-4 border-slate-800 flex justify-around items-center bg-slate-950/90 px-4 z-[1000]">
+      {/* Added safe area padding to ensure system bar doesn't block icons */}
+      <nav className="border-t-4 border-slate-800 flex justify-around items-center bg-slate-950/90 px-4 z-[1000]" style={{ paddingBottom: 'env(safe-area-inset-bottom)', height: 'calc(5rem + env(safe-area-inset-bottom))' }}>
         <NavButton active={activeView === 'tracker'} onClick={() => handleNav('tracker')} label="Map" icon={<PIXEL_ICONS.Map />} />
         <NavButton active={activeView === 'report'} onClick={() => handleNav('report')} label="Sync" icon={<PIXEL_ICONS.Report />} />
         <NavButton active={activeView === 'automation'} onClick={() => handleNav('automation')} label="Auto" icon={<PIXEL_ICONS.Automation />} />
